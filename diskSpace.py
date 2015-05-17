@@ -11,24 +11,24 @@ class HardDriveSpaceException(Exception):
         return repr(self.parameter)
 
 
-def get_free_space(folder, format="MB"):
+def get_free_space(folder, units="MB"):
     """ 
         Return folder/drive free space 
     """
-    fConstants = {"GB": 1073741824,
-                  "MB": 1048576,
-                  "KB": 1024,
-                  "B": 1
-                  }
+    u_constants = {"GB": 1073741824,
+                   "MB": 1048576,
+                   "KB": 1024,
+                   "B": 1
+                   }
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, ctypes.pointer(total_bytes),
                                                    ctypes.pointer(free_bytes))
-        return int(free_bytes.value / fConstants[format.upper()]), int(
-            total_bytes.value / fConstants[format.upper()]), format
+        return int(free_bytes.value / u_constants[units.upper()]), int(
+            total_bytes.value / u_constants[units.upper()]), units
     else:
-        return int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / fConstants[format.upper()]), format
+        return int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / u_constants[units.upper()]), units
 
 
 if __name__ == "__main__":
