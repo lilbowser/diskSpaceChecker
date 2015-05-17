@@ -12,8 +12,11 @@ class HardDriveSpaceException(Exception):
 
 
 def get_free_space(folder, units="MB"):
+
     """ 
-        Return folder/drive free space 
+        Return folder/drive free space
+        :rtype: (int, int, str)
+        :type folder: str
     """
     u_constants = {"GB": 1073741824,
                    "MB": 1048576,
