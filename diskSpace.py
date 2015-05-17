@@ -18,11 +18,8 @@ def get_free_space(folder, units="MB"):
         :rtype: (int, int, str)
         :type folder: str
     """
-    u_constants = {"GB": 1073741824,
-                   "MB": 1048576,
-                   "KB": 1024,
-                   "B": 1
-                   }
+
+    u_constants = get_byte_unit_const(units)
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
@@ -32,6 +29,15 @@ def get_free_space(folder, units="MB"):
             total_bytes.value / u_constants[units.upper()]), units
     else:
         return int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / u_constants[units.upper()]), units
+
+def get_byte_unit_const(units = "MB"):
+    
+    unit_const = {"GB": 1073741824,
+               "MB": 1048576,
+               "KB": 1024,
+               "B": 1
+               }
+    return unit_const[units.upper()]
 
 
 if __name__ == "__main__":
