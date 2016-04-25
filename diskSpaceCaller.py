@@ -5,7 +5,7 @@ import os
 #
 # drives = win32api.GetLogicalDriveStrings()
 # drives = drives.split("\x00")
-drives = diskSpace.get_available_disks(True)
+drives = diskSpace.get_available_disks(True, 7.4)
 for drive in drives:
     # drive = drive.strip('\\')
     # drive = drive.lower()

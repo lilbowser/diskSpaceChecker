@@ -14,12 +14,12 @@ class HardDriveSpaceException(Exception):
 
 def get_free_space(folder, units="MB"):
     """
-        Return folder/drive free space
+        Return folder/drive free space (Free Space, total space, units)
         :rtype: (int, int, str)
         :type folder: str
     """
 
-    u_constants = get_byte_unit_const(units)
+    u_constants = get_byte_unit_def(units)
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
@@ -31,7 +31,12 @@ def get_free_space(folder, units="MB"):
         return int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / u_constants), units
 
 
-def get_byte_unit_const(units="MB"):
+def get_byte_unit_def(units="MB"):
+    """
+    Input: Units(str). Returns const based on input.
+    :param units:
+    :return:
+    """
     unit_const = {"GB": 1073741824,
                   "MB": 1048576,
                   "KB": 1024,
@@ -40,22 +45,41 @@ def get_byte_unit_const(units="MB"):
     return unit_const[units.upper()]
 
 
-def get_available_disks(only_real_drives=True):
+def get_available_disks(only_real_drives=True, minimum_drive_size=0):
+    """
+    Returns a list of disk drives on the system
+    First input control whether all drives are listed, or just writeable drives. (Default is only writeable.)
+    Second input controls the minimum size a drive must be (In GB). 0 turns this off. (Default is 0.)
+    :type minimum_drive_size: int
+    :type only_real_drives: bool
+    :rtype: list[drives]
+    """
+
     drives = win32api.GetLogicalDriveStrings()
     drives = drives.split("\x00")
 
-    if only_real_drives: 
+    if only_real_drives:
         real_drives = []
         for drive in drives:
             if os.path.isdir(drive):  # if drive is a directory
-                real_drives.append(drive)
+                 real_drives.append(drive)
         if not real_drives:
-            return drives  # if real_drives is empty, lets return drives to prevent any problems.
+            pass  # if real_drives is empty, lets return drives to prevent any problems.
         else:
-            return real_drives
+            drives = real_drives
 
-    else:
-        return drives
+    if minimum_drive_size > 0:
+        large_drive = []
+        minimum_drive_size *= get_byte_unit_def("GB")
+        for drive in drives:
+            (free, total, units) = get_free_space(drive, "B")
+            if total > minimum_drive_size:
+                large_drive.append(drive)
+        if not large_drive:
+            pass
+        else:
+            drives = large_drive
+    return drives
 
 
 if __name__ == "__main__":
