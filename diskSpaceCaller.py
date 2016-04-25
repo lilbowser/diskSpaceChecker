@@ -9,7 +9,7 @@ drives = diskSpace.get_available_disks(True, 7.4)
 for drive in drives:
     # drive = drive.strip('\\')
     # drive = drive.lower()
-    print drive
-    print os.path.isdir(drive)
-    print (diskSpace.get_free_space(drive, "GB"))
-raw_input("End")
+    print(drive)
+    print(os.path.isdir(drive))
+    print((diskSpace.get_free_space(drive, "GB")))
+input("End")

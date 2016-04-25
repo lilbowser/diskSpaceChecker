@@ -86,9 +86,9 @@ if __name__ == "__main__":
     try:
         byteFormat = "mb"
         size = get_free_space(r"c:", byteFormat)
-        print size
+        print(size)
         if size[0] < 10000000000:
             raise HardDriveSpaceException(
                 "Hard drive space limit reached, there is only %s %s space left." % (size[0], size[1]))
     except HardDriveSpaceException as e:
-        print e
+        print(e)
