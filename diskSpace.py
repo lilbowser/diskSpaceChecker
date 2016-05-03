@@ -21,8 +21,10 @@ class HardDriveSpaceException(Exception):
 def get_free_space(folder, units="MB"):
     """
         Return folder/drive free space (Free Space, total space, units)
-        :rtype: (int, int, str)
+
         :type folder: str
+        :return: A Dict with items: units, bytes_per_unit, folder, free, total
+        :rtype: dict
     """
 
     u_constants = get_byte_unit_def(units)
