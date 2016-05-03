@@ -1,8 +1,14 @@
+#! python3
+
+# Library for finding the total and remaining disk space of a drive.
+# Copyright AGoldfarb April 2016
+
 import ctypes
 import platform
 import os
 import win32api
 
+__version__ = "0.1.1"
 
 class HardDriveSpaceException(Exception):
     def __init__(self, value):
@@ -20,15 +26,29 @@ def get_free_space(folder, units="MB"):
     """
 
     u_constants = get_byte_unit_def(units)
+    disk_info = {
+        'units': units,
+        'bytes_per_unit': u_constants,
+        'folder': folder
+    }
+
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, ctypes.pointer(total_bytes),
                                                    ctypes.pointer(free_bytes))
-        return int(free_bytes.value / u_constants), int(
-            total_bytes.value / u_constants), units
+
+        disk_info['free'] = int(free_bytes.value / u_constants)
+        disk_info['total'] = int(total_bytes.value / u_constants)
+
+        # return int(free_bytes.value / u_constants), int(total_bytes.value / u_constants), units
+        return disk_info
     else:
-        return int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / u_constants), units
+        disk_info['free'] = int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / u_constants)
+        disk_info['total'] = int(os.statvfs(folder).f_blocks * os.statvfs(folder).f_bsize / u_constants)
+
+        # return int(os.statvfs(folder).f_bfree * os.statvfs(folder).f_bsize / u_constants), units
+        return disk_info
 
 
 def get_byte_unit_def(units="MB"):
@@ -50,9 +70,10 @@ def get_available_disks(only_real_drives=True, minimum_drive_size=0):
     Returns a list of disk drives on the system
     First input control whether all drives are listed, or just writeable drives. (Default is only writeable.)
     Second input controls the minimum size a drive must be (In GB). 0 turns this off. (Default is 0.)
-    :type minimum_drive_size: int
-    :type only_real_drives: bool
-    :rtype: list[drives]
+
+    @type minimum_drive_size: int
+    @type only_real_drives: bool
+    @rtype: list[drives]
     """
 
     drives = win32api.GetLogicalDriveStrings()
